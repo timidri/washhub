@@ -11,13 +11,12 @@ import (
 )
 
 var githubClient *github.Client
-var userName string
 
 // GithubClient returns a github client as a singleton
 func GithubClient() *github.Client {
 	if githubClient == nil {
 		if UserName() == "" || password() == "" {
-			fmt.Printf("Please specify github_user and github_password in ~/.washhub.yaml")
+			fmt.Fprintf(os.Stderr, "Please specify github_user and github_password in ~/.washhub.yaml")
 			os.Exit(1)
 		}
 
