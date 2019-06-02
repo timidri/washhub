@@ -9,7 +9,7 @@ You can navigate your organisations, repos, directories and files.
 
 1. Of course you already have Wash installed and working on your local system. If not, see [Wash Docs](https://puppetlabs.github.io/wash/) for instructions on how to get up and running!
 1. Make sure you have Go installed on your system (tested with go 1.12.5)
-1. Clone the `washhub` repo and build `washhub`: 
+1. Clone the `washhub` repo and build `washhub`:
 
     ```bash
     go get github.com/timidri/washhub
@@ -18,19 +18,19 @@ You can navigate your organisations, repos, directories and files.
     go build
     ```
 
-1. Configure your github credentials in `~/.washhubrc`:
+1. Configure your github credentials in `~/.washhub.yaml`:
 
     ```bash
-    cat > ~/.washhubrc
-    export GITHUB_USER=<my_github_user>
-    export GITHUB_PASSWORD=<my_github_password>
+    cat > ~/.washhub.yaml
+    github_user: <my_github_user>
+    github_password: <my_github_password>
     ```
 
 1. Configure Wash to use the washhub plugin by editing the `wash.yaml` configuration file (`~/.puppetlabs/wash/wash.yaml` by default):
 
     ```yaml
     external-plugins:
-        - script: '/path/to/washhub/washhub.sh'
+      - script: '/path/to/washhub/washhub'
     ```
 
 1. Enjoy!

@@ -25,10 +25,10 @@ import (
 
 // readCmd represents the read command
 var readCmd = &cobra.Command{
-	Use:  "read",
-	Args: cobra.ExactArgs(2),
+	Use:   "read <path> [<state>]",
+	Short: "Read content at <path>",
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("read called")
 		path := strings.TrimPrefix(args[0], "/github/")
 		org, tail := SplitPath(path)
 		repo, path := SplitPath(tail)
@@ -38,10 +38,7 @@ var readCmd = &cobra.Command{
 
 func printFile(org string, repo string, path string) {
 	fileContent, _, err := FetchRepositoryContent(org, repo, path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v", err.Error())
-		os.Exit(1)
-	}
+	HandleError(err)
 	decodedContent, _ := b64.StdEncoding.DecodeString(*fileContent.Content)
 	fmt.Println(string(decodedContent))
 	os.Exit(0)

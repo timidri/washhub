@@ -28,25 +28,19 @@ import (
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Args: cobra.ExactArgs(2),
+	Use:   "list <path> [<state>]",
+	Short: "List content at <path>",
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		path := strings.TrimSuffix(args[0], "/")
 		if path == "/github" { // we are at top level
-			ListOrganisations()
+			listOrganisations()
 		} else {
 			path = strings.TrimPrefix(path, "/github/")
 			if strings.Contains(path, "/") { // we have at least org and repo in the path
-				ListContent(path)
+				listContent(path)
 			} else { // we have only an org in the path
-				ListRepos(path)
+				listRepos(path)
 			}
 			os.Exit(0)
 		}
@@ -54,14 +48,17 @@ to quickly create a Cobra application.`,
 	},
 }
 
-func HandleError(err error) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v", err.Error())
-		os.Exit(1)
-	}
+type attributes struct {
+	Size int `json:"size"`
 }
 
-func ListContent(path string) {
+type entry struct {
+	Name       string     `json:"name"`
+	Methods    []string   `json:"methods"`
+	Attributes attributes `json:"attributes"`
+}
+
+func listContent(path string) {
 	org, tail := SplitPath(path)
 	repo, filePath := SplitPath(tail)
 	_, dirContent, err := FetchRepositoryContent(org, repo, filePath)
@@ -70,18 +67,16 @@ func ListContent(path string) {
 	PrintEntries(entries)
 }
 
-func ListRepos(org string) {
+func listRepos(org string) {
 	repos, _, err := GithubClient().Repositories.List(context.Background(), org, nil)
 	HandleError(err)
 	entries := reposToEntries(repos)
 	PrintEntries(entries)
 }
 
-func ListOrganisations() {
+func listOrganisations() {
 	orgs, _, err := GithubClient().Organizations.ListOrgMemberships(context.Background(), nil)
 	HandleError(err)
-	// json, _ := json.Marshal(orgs)
-	// fmt.Println(string(pretty.Pretty(json)))
 
 	var entries []*entry
 
@@ -115,20 +110,10 @@ func PrintEntry(entry *entry) {
 	fmt.Println(string(pretty.Pretty(json)))
 }
 
-type attributes struct {
-	Size int `json:"size"`
-}
-type entry struct {
-	Name       string     `json:"name"`
-	Methods    []string   `json:"methods"`
-	Attributes attributes `json:"attributes"`
-}
-
 // directoryToEntries converts github dirContent to entries
 func directoryToEntries(dirEntries []*github.RepositoryContent) []*entry {
 	entries := make([]*entry, len(dirEntries))
 	for i, dirEntry := range dirEntries {
-		// fmt.Println("dirEntry:", dirEntry)
 		myEntry := &entry{
 			Name: *dirEntry.Name,
 			Attributes: attributes{
@@ -158,21 +143,6 @@ func reposToEntries(repos []*github.Repository) []*entry {
 		entries[i] = myEntry
 	}
 	return entries
-}
-
-func fetchRepositories(username string) ([]*github.Repository, error) {
-	repos, _, err := GithubClient().Repositories.List(context.Background(), username, nil)
-	return repos, err
-}
-
-func listRepos() ([]*github.Repository, error) {
-	username := UserName()
-	repos, err := fetchRepositories(username)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-	return repos, nil
 }
 
 func init() {
