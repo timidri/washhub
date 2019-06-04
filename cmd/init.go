@@ -32,8 +32,8 @@ var initCmd = &cobra.Command{
 				"list", "read"
 			],
 			"cache_ttls": {
-				"list": 60,
-				"read": 60
+				"list": 600,
+				"read": 30
 			}		
 		}`
 		fmt.Println(response)
