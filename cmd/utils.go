@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/oauth2"
+
 	"github.com/google/go-github/github"
 	"github.com/spf13/viper"
 )
@@ -15,27 +17,50 @@ var githubClient *github.Client
 // GithubClient returns a github client as a singleton
 func GithubClient() *github.Client {
 	if githubClient == nil {
-		if UserName() == "" || password() == "" {
-			fmt.Fprintf(os.Stderr, "Please specify github_user and github_password in ~/.washhub.yaml")
+		if token() != "" {
+			ts := oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: token()},
+			)
+			tc := oauth2.NewClient(context.Background(), ts)
+			githubClient = github.NewClient(tc)
+		} else if UserName() == "" || password() == "" {
+			fmt.Fprintf(os.Stderr, "Please specify github_token or github_user and github_password in ~/.washhub.yaml")
 			os.Exit(1)
+		} else {
+			tp := github.BasicAuthTransport{
+				Username: UserName(),
+				Password: password(),
+			}
+			githubClient = github.NewClient(tp.Client())
 		}
-
-		tp := github.BasicAuthTransport{
-			Username: UserName(),
-			Password: password(),
-		}
-		githubClient = github.NewClient(tp.Client())
 	}
+
 	return githubClient
 }
 
 // UserName returns the configured user name
 func UserName() string {
-	return viper.Get("github_user").(string)
+	user := viper.Get("github_user")
+	if user == nil {
+		return ""
+	}
+	return user.(string)
 }
 
 func password() string {
-	return viper.Get("github_password").(string)
+	password := viper.Get("github_password")
+	if password == nil {
+		return ""
+	}
+	return password.(string)
+}
+
+func token() string {
+	token := viper.Get("github_token")
+	if token == nil {
+		return ""
+	}
+	return token.(string)
 }
 
 // FetchRepositoryContent returns the content at path (a dir listing or file content)
