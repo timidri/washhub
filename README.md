@@ -52,7 +52,7 @@ Washhub supports the following Wash actions:
 Listing orgs with lots of repos can result in a washhub error:
 
 ```quote
-DEBU FUSE: Find .git in /github/`<org>` errored: script returned a non-zero exit code of 1. stderr output: Error: GET https://api.github.com/orgs/<org>/repos?per_page=99: 502 Server Error []
+DEBU FUSE: Find .git in /github/<org> errored: script returned a non-zero exit code of 1. stderr output: Error: GET https://api.github.com/orgs/<org>/repos?per_page=99: 502 Server Error []
 ```
 
 This erroneous behaviour is documented [here](https://github.com/google/go-github/issues/999) and I didn't find a work-around for now. Ideas welcome!
