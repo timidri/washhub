@@ -47,13 +47,22 @@ Washhub supports the following Wash actions:
 * `list`: organizations, repos and directories inside repos
 * `read`: files
 
+## Known bugs
+
+Listing orgs with lots of repos can result in a washhub error:
+
+```quote
+DEBU FUSE: Find .git in /github/`<org>` errored: script returned a non-zero exit code of 1. stderr output: Error: GET https://api.github.com/orgs/`<org>`/repos?per_page=99: 502 Server Error []
+```
+
+This erroneous behaviour is documented [here](https://github.com/google/go-github/issues/999) and didn't find a work-around for now. Ideas welcome!
+
 ## Limitations of `washhub`
 
 * Supported are repos, directories and files, other objects such as projects, issues or commits are not supported
 * No `metadata` support yet
 * `stream` or `exec` not supported because Github doesn't support that
 * non-authenticated operation not supported
-* Private repos not yet supported
 * You can hit Github API limits if you use `washhub` _a lot_
   
 ## Author
