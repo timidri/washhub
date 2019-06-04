@@ -12,9 +12,7 @@ You can navigate your organisations, repos, directories and files.
 1. Clone the `washhub` repo and build `washhub`:
 
     ```bash
-    go get github.com/timidri/washhub
-    cd ${GOPATH}/src/github.com/timidri/washhub
-    go get
+    git clone https://github.com/timidri/washhub
     go build
     ```
 
