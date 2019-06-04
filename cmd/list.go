@@ -33,16 +33,22 @@ var listCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		path := strings.TrimSuffix(args[0], "/")
+		user, _, err := GithubClient().Users.Get(context.Background(), "")
+		HandleError(err)
+
 		if path == "/github" { // we are at top level
-			listOrganisations()
+			listOrganisations(user)
 		} else {
 			path = strings.TrimPrefix(path, "/github/")
 			if strings.Contains(path, "/") { // we have at least org and repo in the path
 				listContent(path)
-			} else { // we have only an org in the path
-				listRepos(path)
+			} else { // we have only an org or a user in the path
+				if user.GetLogin() == path { // we want to list user's repos
+					listUserRepos(path)
+				}
+				// list org's repos
+				listOrgRepos(path)
 			}
-			os.Exit(0)
 		}
 		os.Exit(0)
 	},
@@ -67,21 +73,66 @@ func listContent(path string) {
 	PrintEntries(entries)
 }
 
-func listRepos(org string) {
-	repos, _, err := GithubClient().Repositories.List(context.Background(), org, nil)
-	HandleError(err)
-	entries := reposToEntries(repos)
+func listOrgRepos(org string) {
+	opt := &github.RepositoryListByOrgOptions{
+		// setting PerPage to 99 instead of 100 to work around
+		// https://github.com/google/go-github/issues/999
+		// but work-around doesn't seem to work...
+		ListOptions: github.ListOptions{PerPage: 99},
+	}
+	// get all pages of results
+	var allRepos []*github.Repository
+	for {
+		repos, resp, err := GithubClient().Repositories.ListByOrg(context.Background(), org, opt)
+		if err != nil {
+			HandleError(err)
+		}
+		allRepos = append(allRepos, repos...)
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.Page = resp.NextPage
+	}
+	entries := reposToEntries(allRepos)
 	PrintEntries(entries)
+	os.Exit(0)
 }
 
-func listOrganisations() {
+func listUserRepos(userName string) {
+	opt := &github.RepositoryListOptions{
+		Affiliation: "owner", // we want only owner's repos
+		// setting PerPage to 99 instead of 100 to work around
+		// https://github.com/google/go-github/issues/999
+		// but work-around doesn't seem to work...
+		ListOptions: github.ListOptions{PerPage: 99},
+	}
+	// get all pages of results
+	var allRepos []*github.Repository
+	for {
+		// passing empty string for user name to get repos for authenticated user
+		repos, resp, err := GithubClient().Repositories.List(context.Background(), "", opt)
+		if err != nil {
+			HandleError(err)
+		}
+		allRepos = append(allRepos, repos...)
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.Page = resp.NextPage
+	}
+	entries := reposToEntries(allRepos)
+	PrintEntries(entries)
+	os.Exit(0)
+}
+
+func listOrganisations(user *github.User) {
 	orgs, _, err := GithubClient().Organizations.ListOrgMemberships(context.Background(), nil)
 	HandleError(err)
 
 	var entries []*entry
 
 	userEntry := &entry{
-		Name:    UserName(),
+		Name:    user.GetLogin(),
 		Methods: []string{"list"},
 	}
 
