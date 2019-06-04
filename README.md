@@ -22,6 +22,13 @@ You can navigate your organisations, repos, directories and files.
 
     ```bash
     cat > ~/.washhub.yaml
+    github_token: <my_github_token>
+    ```
+
+    Alternatively, you can use user credentials:
+
+    ```bash
+    cat > ~/.washhub.yaml
     github_user: <my_github_user>
     github_password: <my_github_password>
     ```
@@ -48,7 +55,7 @@ Washhub supports the following Wash actions:
 * No `metadata` support yet
 * `stream` or `exec` not supported because Github doesn't support that
 * non-authenticated operation not supported
-* Private repos not supported
+* Private repos not yet supported
 * You can hit Github API limits if you use `washhub` _a lot_
   
 ## Author
