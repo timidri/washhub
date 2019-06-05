@@ -70,6 +70,10 @@ func FetchRepositoryContent(username string, repo string, path string) (*github.
 }
 
 // SplitPath splits a path in a head part and a tail part
+// examples:
+//   SplitPath("a") -> ("a","")
+//   SplitPath("a/b") -> ("a","b")
+//   SplitPath("a/b/c") => ("a", "b/c")
 func SplitPath(path string) (string, string) {
 	parts := strings.SplitN(path, string(os.PathSeparator), 2)
 	head := parts[0]
