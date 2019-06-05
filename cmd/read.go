@@ -17,7 +17,6 @@ package cmd
 import (
 	b64 "encoding/base64"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -41,7 +40,6 @@ func printFile(org string, repo string, path string) {
 	HandleError(err)
 	decodedContent, _ := b64.StdEncoding.DecodeString(*fileContent.Content)
 	fmt.Println(string(decodedContent))
-	os.Exit(0)
 }
 
 func init() {
