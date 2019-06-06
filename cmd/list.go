@@ -28,7 +28,7 @@ import (
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:   "list <path> [<state>]",
+	Use:   "list <path> ''",
 	Short: "List content at <path>",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -43,11 +43,13 @@ var listCmd = &cobra.Command{
 			if strings.Contains(path, "/") { // we have at least org and repo in the path
 				listContent(path)
 			} else { // we have only an org or a user in the path
-				if user.GetLogin() == path { // we want to list user's repos
+				if user.GetLogin() == path {
+					// list user's repos
 					listUserRepos(path)
+				} else {
+					// list org's repos
+					listOrgRepos(path)
 				}
-				// list org's repos
-				listOrgRepos(path)
 			}
 		}
 		os.Exit(0)
@@ -84,9 +86,8 @@ func listOrgRepos(org string) {
 	var allRepos []*github.Repository
 	for {
 		repos, resp, err := GithubClient().Repositories.ListByOrg(context.Background(), org, opt)
-		if err != nil {
-			HandleError(err)
-		}
+		HandleError(err)
+
 		allRepos = append(allRepos, repos...)
 		if resp.NextPage == 0 {
 			break
@@ -95,7 +96,6 @@ func listOrgRepos(org string) {
 	}
 	entries := reposToEntries(allRepos)
 	PrintEntries(entries)
-	os.Exit(0)
 }
 
 func listUserRepos(userName string) {
@@ -111,9 +111,8 @@ func listUserRepos(userName string) {
 	for {
 		// passing empty string for user name to get repos for authenticated user
 		repos, resp, err := GithubClient().Repositories.List(context.Background(), "", opt)
-		if err != nil {
-			HandleError(err)
-		}
+		HandleError(err)
+
 		allRepos = append(allRepos, repos...)
 		if resp.NextPage == 0 {
 			break
@@ -122,7 +121,6 @@ func listUserRepos(userName string) {
 	}
 	entries := reposToEntries(allRepos)
 	PrintEntries(entries)
-	os.Exit(0)
 }
 
 func listOrganisations(user *github.User) {
@@ -146,7 +144,6 @@ func listOrganisations(user *github.User) {
 		entries = append(entries, orgEntry)
 	}
 	PrintEntries(entries)
-	os.Exit(0)
 }
 
 // PrintEntries prints the entries
@@ -176,7 +173,6 @@ func directoryToEntries(dirEntries []*github.RepositoryContent) []*entry {
 		} else {
 			myEntry.Methods = []string{"list"}
 		}
-
 		entries[i] = myEntry
 	}
 	return entries
