@@ -13,10 +13,11 @@ You can navigate your organisations, repos, directories and files.
 
     ```bash
     git clone https://github.com/timidri/washhub
+    cd washhub
     go build
     ```
 
-1. Configure your github credentials in `~/.washhub.yaml`:
+1. Configure your github token in `~/.washhub.yaml`:
 
     ```bash
     cat > ~/.washhub.yaml
@@ -49,7 +50,7 @@ Washhub supports the following Wash actions:
 
 ## Known bugs
 
-Listing orgs with lots of repos can result in a washhub error:
+Listing orgs with lots of repos can result in an empty repository listing. When running wash in debug mode (`wash --loglevel debug`) the following error is displayed:
 
 ```quote
 DEBU FUSE: Find .git in /github/<org> errored: script returned a non-zero exit code of 1. stderr output: Error: GET https://api.github.com/orgs/<org>/repos?per_page=99: 502 Server Error []
