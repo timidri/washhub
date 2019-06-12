@@ -36,10 +36,10 @@ var listCmd = &cobra.Command{
 		user, _, err := GithubClient().Users.Get(context.Background(), "")
 		HandleError(err)
 
-		if path == "/github" { // we are at top level
+		if path == "/"+PluginName { // we are at top level
 			listOrganisations(user)
 		} else {
-			path = strings.TrimPrefix(path, "/github/")
+			path = strings.TrimPrefix(path, "/"+PluginName+"/")
 			if strings.Contains(path, "/") { // we have at least org and repo in the path
 				listContent(path)
 			} else { // we have only an org or a user in the path

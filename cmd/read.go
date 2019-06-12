@@ -28,7 +28,7 @@ var readCmd = &cobra.Command{
 	Short: "Read content at <path>",
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		path := strings.TrimPrefix(args[0], "/github/")
+		path := strings.TrimPrefix(args[0], "/"+PluginName+"/")
 		org, tail := SplitPath(path)
 		repo, path := SplitPath(tail)
 		printFile(org, repo, path)

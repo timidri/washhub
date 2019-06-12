@@ -20,6 +20,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// PluginName is the name of our plugin
+const PluginName = "washhub"
+
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -27,7 +30,6 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		response := `
 		{
-			"name": "github",
 			"methods": [
 				"list", "read"
 			],
