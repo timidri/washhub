@@ -31,7 +31,7 @@ var initCmd = &cobra.Command{
 		response := `
 		{
 			"methods": [
-				"list", "read"
+				"list"
 			],
 			"cache_ttls": {
 				"list": 600,
