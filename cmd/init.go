@@ -21,7 +21,7 @@ import (
 )
 
 // PluginName is the name of our plugin
-const PluginName = "washhub"
+const PluginName = "github"
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
@@ -30,6 +30,7 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		response := `
 		{
+			"name": "github",
 			"methods": [
 				"list"
 			],

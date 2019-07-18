@@ -9,12 +9,12 @@ You can navigate your organisations, repos, directories and files.
 
 1. Of course you already have Wash installed and working on your local system. If not, see [Wash Docs](https://puppetlabs.github.io/wash/) for instructions on how to get up and running!
 1. Make sure you have Go installed on your system (tested with go 1.12.5)
-1. Clone the `washhub` repo and build `washhub`:
+1. Clone the `washhub` repo and build the plugin. The executable name needs to be `github`:
 
     ```bash
     git clone https://github.com/timidri/washhub
     cd washhub
-    go build
+    go build -o github
     ```
 
 1. Configure your github token in `~/.washhub.yaml`:
@@ -36,7 +36,7 @@ You can navigate your organisations, repos, directories and files.
 
     ```yaml
     external-plugins:
-      - script: '/path/to/washhub/washhub'
+      - script: '/path/to/washhub/github'
     ```
 
 1. Enjoy!
